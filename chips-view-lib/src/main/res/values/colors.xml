@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="chip">#333</color>
+    <color name="dark_grey">#F1675D</color>
+    <color name="light_grey">#fff</color>
+    <color name="white">#ffffff</color>
+
+    <color name="selected_color">#1AF1675D</color>
+    <color name="selected_font_color">#F1675D</color>
+
+    <color name="deselected_color">#fff</color>
+    <color name="deselected_font_color">@android:color/darker_gray</color>
+</resources>

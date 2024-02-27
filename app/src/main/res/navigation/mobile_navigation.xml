@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/tasksFragment">
+    <fragment
+        android:id="@+id/tasksFragment"
+        android:name="com.misbah.todo.ui.tasks.TasksFragment"
+        android:label="@string/tasks"
+        tools:layout="@layout/fragment_tasks">
+        <action
+            android:id="@+id/action_tasksFragment_to_addEditTaskFragment"
+            app:destination="@id/addEditTaskFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/addEditTaskFragment"
+        android:name="com.misbah.todo.ui.tasks.AddEditTaskFragment"
+        android:label="{title}"
+        tools:layout="@layout/fragment_add_edit_task">
+        <argument
+            android:name="task"
+            android:defaultValue="@null"
+            app:argType="com.misbah.todo.core.data.model.Task"
+            app:nullable="true" />
+        <argument
+            android:name="title"
+            app:argType="string" />
+    </fragment>
+    <dialog
+        android:id="@+id/deleteAllCompletedDialogFragment"
+        android:name="com.misbah.todo.ui.dialogs.ConfirmationDialogFragment"
+        android:label="@string/delete_confirmation" />
+    <dialog
+        android:id="@+id/dateTimePickerDialogFragment"
+        android:name="com.misbah.todo.ui.dialogs.TimePickerFragment"
+        android:label="@string/date_time_picker" />
+    <dialog
+        android:id="@+id/quitAppDialogFragment"
+        android:name="com.misbah.todo.ui.dialogs.QuitDialogFragment"
+        android:label="@string/quit" />
+    <dialog
+        android:id="@+id/addCategoryDialogFragment"
+        android:name="com.misbah.todo.ui.category.AddCategoryDialogFragment"
+        android:label="@string/add_category" />
+    <action
+        android:id="@+id/action_global_deleteAllCompletedDialogFragment"
+        app:destination="@id/deleteAllCompletedDialogFragment" />
+
+    <action
+        android:id="@+id/action_global_quitAppDialogFragment"
+        app:destination="@id/quitAppDialogFragment" />
+    <action
+        android:id="@+id/action_addTask_to_DateTimePickerFragment"
+        app:destination="@id/dateTimePickerDialogFragment" />
+    <action
+        android:id="@+id/action_tasksFragment_to_addEditTaskFragment"
+        app:destination="@id/addEditTaskFragment" />
+    <action
+        android:id="@+id/action_addCategoryDialogFragment"
+        app:destination="@id/addCategoryDialogFragment" />
+    <fragment
+        android:id="@+id/nav_settings"
+        android:name="com.misbah.todo.ui.settings.SettingsFragment"
+        android:label="@string/menu_settings"
+        tools:layout="@layout/fragment_settings" />
+
+    <fragment
+        android:id="@+id/nav_category"
+        android:name="com.misbah.todo.ui.category.CategoryFragment"
+        android:label="@string/menu_tasks_category"
+        tools:layout="@layout/fragment_category"/>
+</navigation>

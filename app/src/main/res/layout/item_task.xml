@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clickable="true"
+    android:layout_marginStart="12dp"
+    android:layout_marginEnd="12dp"
+    android:focusable="true"
+    android:theme="@style/Theme.MaterialComponents.Light"
+    android:foreground="?android:attr/selectableItemBackground"
+    app:cardElevation="3dp"
+    app:cardBackgroundColor="@android:color/white"
+    app:cardUseCompatPadding="true"
+    app:cardCornerRadius="@dimen/card_corner_radius">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:padding="12dp"
+        android:orientation="vertical"
+        tools:ignore="UseCompoundDrawables">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:layout_height="wrap_content">
+            <CheckBox
+                android:id="@+id/check_box_completed"
+                android:layout_width="wrap_content"
+                android:layout_marginEnd="12dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/ic_checkbox_selector"
+                android:button="@null"
+                android:minWidth="0dp"
+                android:minHeight="0dp" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:orientation="vertical"
+                android:layout_weight="1"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/text_view_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:gravity="center_vertical"
+                    android:maxLines="1"
+                    android:textSize="14sp"
+                    android:fontFamily="@font/lato"
+                    android:textColor="@color/text_color_red"
+                    tools:text="Example item" />
+                <TextView
+                    android:id="@+id/text_view_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:layout_marginTop="4dp"
+                    android:gravity="center_vertical"
+                    android:maxLines="1"
+                    android:fontFamily="@font/lato"
+                    android:textSize="12sp"
+                    android:textColor="@color/black"
+                    tools:text="Example item" />
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/label_option"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top"
+                android:contentDescription="@null"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_option_menu" />
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:layout_marginTop="12dp"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/text_view_date_due"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:gravity="center_vertical"
+                android:maxLines="1"
+                android:textSize="14sp"
+                android:drawablePadding="8dp"
+                app:drawableStartCompat="@drawable/ic_calendar"
+                android:fontFamily="@font/lato"
+                android:textColor="@color/gray_dark"
+                tools:text="Example item" />
+            <TextView
+                android:id="@+id/text_priority"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:gravity="center_vertical"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp"
+                android:maxLines="1"
+                android:background="@drawable/bg_category"
+                android:fontFamily="@font/lato"
+                android:textSize="13sp"
+                android:textColor="@color/text_color_red"
+                tools:text="Example item" />
+        </LinearLayout>
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>
+

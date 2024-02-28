@@ -7,7 +7,7 @@ import dagger.Provides
 
 /**
  * @author: MOHAMMAD MISBAH
- * @since: 16-Jul-2022
+ * @since: 27-Feb-2024
  * @sample: Technology Assessment for Android Role
  * @desc MainActivityModule for dependencies injections
  * Email Id: mohammadmisbahazmi@gmail.com

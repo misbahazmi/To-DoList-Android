@@ -23,7 +23,7 @@ data class FilterPreferences(val sortOrder: SortOrder, val hideCompleted: Boolea
 
 class PreferencesManager @Inject constructor(private  val context : Context) {
 
-    private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "user_preferences")
+    private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "todo_preferences")
 
     //private val dataStore = context.createDataStore("user_preferences")
 

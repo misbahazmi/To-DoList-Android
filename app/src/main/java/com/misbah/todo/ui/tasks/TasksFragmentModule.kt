@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.misbah.todo.core.data.remote.RemoteDataSource
 import com.misbah.todo.core.data.storage.PreferencesManager
 import com.misbah.todo.core.data.storage.TaskDao
-import com.misbah.todo.core.data.storage.TasksInfo
 import com.misbah.todo.core.di.factory.ViewModelFactory
 import dagger.Module
 import dagger.Provides
@@ -23,7 +22,7 @@ import dagger.Provides
 class TasksFragmentModule {
 
     @Provides
-    fun provideViewModel(repository: TasksRepository, taskDao : TaskDao, preferencesManager: PreferencesManager, state : SavedStateHandle, context: Context) : TasksViewModel {
+    fun provideViewModel(repository: RemoteTaskRepository, taskDao : TaskDao, preferencesManager: PreferencesManager, state : SavedStateHandle, context: Context) : TasksViewModel {
         return TasksViewModel(repository, taskDao, preferencesManager, state, context)
     }
 
@@ -33,8 +32,8 @@ class TasksFragmentModule {
     }
 
     @Provides
-    fun provideTasksRepository(remoteDataSource: RemoteDataSource) : TasksRepository {
-        return TasksRepository(remoteDataSource)
+    fun provideTasksRepository(remoteDataSource: RemoteDataSource) : RemoteTaskRepository {
+        return RemoteTaskRepository(remoteDataSource)
     }
 
 }

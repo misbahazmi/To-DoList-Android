@@ -6,9 +6,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.asLiveData
-import androidx.lifecycle.viewModelScope
 import androidx.work.WorkManager
-import com.misbah.todo.core.data.model.Task
 import com.misbah.todo.core.data.model.ToDo
 import com.misbah.todo.core.data.storage.PreferencesManager
 import com.misbah.todo.core.data.storage.SortOrder
@@ -21,19 +19,13 @@ import com.nytimes.utils.AppLog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Locale
 import javax.inject.Inject
 
 /**
@@ -46,7 +38,7 @@ import javax.inject.Inject
  */
 class TasksViewModel
 @Inject constructor(
-    private val repository : TasksRepository,
+    private val repository : RemoteTaskRepository,
     private val taskDao: TaskDao,
     private val preferencesManager: PreferencesManager,
     state: SavedStateHandle,

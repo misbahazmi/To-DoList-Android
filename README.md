@@ -34,18 +34,20 @@ To-Do List - A simple to-do list app that allows users to add, delete and mark t
     - For each future task before 15 minutes, a reminder notification will trigger.
 
 # Screenshots
-![Screenshot_20231003-231359_To-Do List](https://github.com/misbahazmi/to-do-list-android/assets/8206573/b8230c96-9a43-46b9-975f-3b913f280b8f)
-![Screenshot_20231003-231414_To-Do List](https://github.com/misbahazmi/to-do-list-android/assets/8206573/57da9ed1-56d3-4ac5-b3fd-ddf6971f0825)
-![Screenshot_20231003-231421_To-Do List](https://github.com/misbahazmi/to-do-list-android/assets/8206573/2eaf6fae-4900-42c2-a15d-4cb134995c1f)
-![Screenshot_20231003-231442_To-Do List](https://github.com/misbahazmi/to-do-list-android/assets/8206573/50e9cdde-e66d-4971-89a8-e8041c7f6361)
-![Screenshot_20231003-231449_To-Do List](https://github.com/misbahazmi/to-do-list-android/assets/8206573/65e9f355-ebdc-455c-b51b-efa179b63a77)
-![Screenshot_20231003-231508_To-Do List](https://github.com/misbahazmi/to-do-list-android/assets/8206573/3c2f2d1e-de4b-4684-9f4c-b18eb2b70165)
-![Screenshot_20231003-231517_To-Do List](https://github.com/misbahazmi/to-do-list-android/assets/8206573/06404176-f02e-40e7-8c69-baf33e932eaf)
-![Screenshot_20231003-231529_To-Do List](https://github.com/misbahazmi/to-do-list-android/assets/8206573/d3b097f7-32f3-43e2-820b-c0feec453881)
-![Screenshot_20231003-231538_To-Do List](https://github.com/misbahazmi/to-do-list-android/assets/8206573/afe37426-117d-48f3-829b-e7f261ed77fc)
-![Screenshot_20231003-231547_To-Do List](https://github.com/misbahazmi/to-do-list-android/assets/8206573/e3fd8d06-1787-49b1-8b7c-890c7d64f1cd)
-![Screenshot_20231003-231558_To-Do List](https://github.com/misbahazmi/to-do-list-android/assets/8206573/930dcdad-e8f7-4969-b849-fa276213086b)
-![Screenshot_20231003-231607_To-Do List](https://github.com/misbahazmi/to-do-list-android/assets/8206573/63997eec-34e9-441a-9cb4-85948da5943a)
+
+![Screenshot_20240304_023242](https://github.com/misbahazmi/To-DoList-Android/assets/8206573/313a85b7-369b-4338-afb3-6584f51e4d87)
+![Screenshot_20240304_023324](https://github.com/misbahazmi/To-DoList-Android/assets/8206573/99317514-3474-422a-adac-2b73673f8022)
+![Screenshot_20240304_023343](https://github.com/misbahazmi/To-DoList-Android/assets/8206573/a4c13184-8977-421a-8855-f98874c09ed9)
+![Screenshot_20240304_023405](https://github.com/misbahazmi/To-DoList-Android/assets/8206573/4c19c9fe-422b-40ab-9135-388925687b77)
+![Screenshot_20240304_023426](https://github.com/misbahazmi/To-DoList-Android/assets/8206573/c6bd0e3f-fa90-4abb-867d-eaeea695f194)
+![Screenshot_20240304_023444](https://github.com/misbahazmi/To-DoList-Android/assets/8206573/6f07e2fe-6b5b-4870-9850-2d40aaba2df1)
+![Screenshot_20240304_023500](https://github.com/misbahazmi/To-DoList-Android/assets/8206573/6c078e16-dec8-4f5e-8a3c-fd2fd34b23fc)
+![Screenshot_20240304_023531](https://github.com/misbahazmi/To-DoList-Android/assets/8206573/665fb391-37c1-45a1-8f9d-2d7e1f4d580d)
+![Screenshot_20240304_023619](https://github.com/misbahazmi/To-DoList-Android/assets/8206573/2025c08f-74c7-4e74-8f35-2d782092826b)
+![Screenshot_20240304_023634](https://github.com/misbahazmi/To-DoList-Android/assets/8206573/bf91a167-6171-409d-80cc-6aea62e35a25)
+![Screenshot_20240304_023654](https://github.com/misbahazmi/To-DoList-Android/assets/8206573/da53e0df-e5b7-4a38-bf33-255aa35f9887)
+![Screenshot_20240304_023848](https://github.com/misbahazmi/To-DoList-Android/assets/8206573/c7f64e72-fdc5-4c8c-9bf6-f98644cbe508)
+
 
 
 

@@ -11,6 +11,8 @@ import com.google.android.material.snackbar.Snackbar
 import com.misbah.todo.R
 import com.nytimes.utils.AppLog
 import java.text.DateFormat
+import java.text.SimpleDateFormat
+import java.util.Date
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -73,6 +75,16 @@ open class Utils @Inject constructor(val context: Context) {
 
     fun dateFormat(date : Long) : String{
        return  DateFormat.getDateTimeInstance().format(date)
+    }
+
+    fun dateValue(created : String?) : Long {
+        return if (created != null && created != ""){
+            val date = SimpleDateFormat("dd-MM-yyyy").parse(created)
+            date?.time ?: Date().time
+        }
+        else{
+            Date().time
+        }
     }
 
     /**

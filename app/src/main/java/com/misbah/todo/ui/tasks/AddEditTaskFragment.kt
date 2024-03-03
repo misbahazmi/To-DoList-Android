@@ -60,6 +60,7 @@ class AddEditTaskFragment : BaseFragment<AddEditTaskViewModel>(), OnDateTimeList
     ): View {
         _binding = FragmentAddEditTaskBinding.inflate(inflater, container, false)
         viewModel.task.value = tasksArgs.task
+        viewModel.getSizeOfTaskList()
         binding.farg = this@AddEditTaskFragment
         return binding.root
     }
@@ -81,7 +82,7 @@ class AddEditTaskFragment : BaseFragment<AddEditTaskViewModel>(), OnDateTimeList
 
             editTextTaskTitle.setText(viewModel.task.value?.title ?: "")
             editTextTaskDescription.setText(viewModel.task.value?.name ?: "")
-            textViewDateDue.text = "Due Date: ${utils.dateFormat(viewModel.task.value?.due!!)}"
+            textViewDateDue.text = "Due Date: ${viewModel.task.value?.dueDateFormatted ?: DateFormat.getDateTimeInstance().format(viewModel.dueDate)}"
             viewModel.taskTitle = viewModel.task.value?.title ?: ""
             viewModel.taskDescription = viewModel.task.value?.name ?: ""
             viewModel.dueDate = viewModel.task.value?.due ?: System.currentTimeMillis()
@@ -94,8 +95,8 @@ class AddEditTaskFragment : BaseFragment<AddEditTaskViewModel>(), OnDateTimeList
             }
             chipTasksPriority.setChipListener( object : ChipListener {
                 override fun chipSelected(index: Int) {
-                    viewModel.taskImportance =  AppEnums.TasksPriority.values().distinct()
-                        .withIndex().first { it.value.value == index }.value.value
+                    viewModel.taskImportance =  AppEnums.TasksPriority.values().distinct().withIndex().first { it.value.value == index }.value.value
+                    viewModel.taskImportanceString =  AppEnums.TasksPriority.values().distinct().withIndex().first { it.value.value == index }.value.name
                 }
                 override fun chipDeselected(index: Int) {}
                 override fun chipRemoved(index: Int) {}
@@ -118,6 +119,7 @@ class AddEditTaskFragment : BaseFragment<AddEditTaskViewModel>(), OnDateTimeList
                 AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(parent: AdapterView<*>, view: View, position: Int, id: Long) {
                     viewModel.tasksCategory = catList[position].id
+                    viewModel.tasksCategoryString = catList[position].name
                 }
                 override fun onNothingSelected(parent: AdapterView<*>) {}
             }

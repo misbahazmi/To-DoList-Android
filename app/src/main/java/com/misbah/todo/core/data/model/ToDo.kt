@@ -22,10 +22,10 @@ data class ToDo(
     @SerializedName("completed" ) var completed : Boolean,
     @SerializedName("userId"    ) var userId    : Int,
     @SerializedName("date"      ) var created      : String?,
-    @SerializedName("dateValue"      ) var createdLong      : Long?,
-    @SerializedName("due"      ) var due      : Long,
+    @SerializedName("dateValue"      ) var createdLong      : Long = Date().time,
+    @SerializedName("due"      ) var due      : Long = Date().time,
     @SerializedName("priority"  ) var important  : String?,
-    @SerializedName("priorityVlaue"  ) var priority  : Int?
+    @SerializedName("priorityValue"  ) var priority  : Int?
 ) : Parcelable {
 
     val createdDateFormatted: String
@@ -76,12 +76,6 @@ data class ToDo(
 
     @SuppressLint("SimpleDateFormat")
     fun getDateValue() : Long {
-        return if (created != null && created != ""){
-            val date = SimpleDateFormat("dd-MM-yyyy").parse(created!!)
-            date?.time ?: Date().time
-        }
-        else{
-            Date().time
-        }
+        return createdLong
     }
 }

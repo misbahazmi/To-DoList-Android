@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
@@ -58,6 +59,7 @@ class TasksViewModel
 
     private val tasksEventChannel = Channel<TasksEvent>()
     val tasksEvent = tasksEventChannel.receiveAsFlow()
+    val isFirstLaunch = preferencesFlow.map { it.isFirstLaunch }.asLiveData()
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val tasksFlow = combine(
@@ -67,37 +69,26 @@ class TasksViewModel
         Pair(query, filterPreferences)
     }.flatMapLatest { (query, filterPreferences) ->
         //taskDao.getTasks(query, filterPreferences.sortOrder, filterPreferences.hideCompleted, filterPreferences.category)
-        taskRepository.getTasksByCategory(filterPreferences.category)
+        taskRepository.getTasksByCategory(query, filterPreferences.sortOrder, filterPreferences.hideCompleted, filterPreferences.category)
     }
     val tasks = tasksFlow.asLiveData()
 
     private val remoteTaskFlow = combine(
         searchQuery.asFlow(),
         preferencesFlow
-    ){query, filterPReferences -> Pair(query, filterPReferences)}.flatMapLatest {
-        repository.getDefaultTasks().asFlow()
+    ){query, filterPReferences -> Pair(query, filterPReferences)}
+        .flatMapLatest {(query, filterPreferences) ->
+            if(filterPreferences.isFirstLaunch)
+                repository.getDefaultTasks().asFlow()
+            else
+                flowOf()
     }
-
-    val localTask = combine(
-        searchQuery.asFlow(),
-        preferencesFlow
-    ){query, filterPReferences -> Pair(query, filterPReferences)}.flatMapLatest {
-        taskRepository.getAllTasks().map {
-            it
-        }
-    }
-
 
     val remoteTasks  = remoteTaskFlow.asLiveData()
 
     val localTasks  = taskRepository.getAllTasks().asLiveData()
 
-
-    fun localTaskByCat(id: Int) : LiveData<List<ToDo>>{
-        return taskRepository.getTasksByCategory(id).asLiveData()
-    }
-
-    var remainingTasks: LiveData<List<Task>>? = null
+    var remainingTasks: LiveData<List<ToDo>>? = null
 
     fun onSortOrderSelected(sortOrder: SortOrder) = CoroutineScope(Dispatchers.IO).launch {
         preferencesManager.updateSortOrder(sortOrder)
@@ -122,16 +113,17 @@ class TasksViewModel
     fun getTasksRemainingTask() = CoroutineScope(Dispatchers.IO).launch {
         val currentTime = System.currentTimeMillis()
         val futureTime = System.currentTimeMillis() + Constants.TASK_REMINDER_TIME_INTERVAL
-        remainingTasks = taskDao.getTasksRemainingTask(true,currentTime,futureTime).asLiveData()
+        remainingTasks = taskRepository.getRemainingTask(true,currentTime,futureTime).asLiveData()
     }
 
     fun onTaskCheckedChanged(task: ToDo, isChecked: Boolean) = CoroutineScope(Dispatchers.IO).launch {
         //taskDao.update(task.copy(taskStatus = isChecked))
+        taskRepository.updateTask(task.copy(completed = isChecked))
     }
 
     fun onTaskSwiped(task: ToDo) {
         CoroutineScope(Dispatchers.IO).launch {
-            //taskDao.delete(task)
+            taskRepository.deleteTask(task.id)
             tasksEventChannel.send(TasksEvent.ShowUndoDeleteTaskMessage(task))
             try {
                 WorkManager.getInstance(context).cancelAllWorkByTag(task.due.toString())
@@ -147,25 +139,12 @@ class TasksViewModel
         }
     }
 
-    fun onUndoDeleteClick(task: ToDo) = CoroutineScope(Dispatchers.IO).launch {
-        //taskDao.insert(task)
+    fun onUndoDeleteClick(todo: ToDo) = CoroutineScope(Dispatchers.IO).launch {
+        taskRepository.updateTask(todo)
     }
 
     fun saveRemoteTask(todo : ToDo) = CoroutineScope(Dispatchers.IO).launch {
-        val task = TaskData.newBuilder()
-            .setTaskId(todo.id)
-            .setTaskTitle(todo.title)
-            .setTaskTodo(todo.name)
-            .setTaskUserId(1)
-            .setTaskStatus(todo.completed)
-            .setTaskDate(todo.getDateValue())
-            .setTaskDuDate(todo.getDateValue())
-            .setTaskCat(todo.categoryValue)
-            .setTaskCatDisplay(todo.category)
-            .setTaskPriority(todo.priorityValue)
-            .setTaskPriorityDisplay(todo.important)
-            .build()
-        taskRepository.saveTask(task)
+        taskRepository.saveTask(todo)
     }
 
     fun getRemoteTask() = CoroutineScope(Dispatchers.IO).launch {
@@ -175,8 +154,6 @@ class TasksViewModel
     fun onAddNewTaskClick() = CoroutineScope(Dispatchers.IO).launch {
         tasksEventChannel.send(TasksEvent.NavigateToAddTaskScreen)
     }
-
-
 
     fun onAddEditResult(result: Int) {
         when (result) {

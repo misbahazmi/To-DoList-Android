@@ -32,6 +32,7 @@ import com.misbah.todo.databinding.FragmentTasksBinding
 import com.misbah.todo.ui.adapters.TasksAdapter
 import com.misbah.todo.ui.listeners.OnItemClickListener
 import com.misbah.todo.ui.main.MainActivity
+import com.misbah.todo.ui.utils.Utils
 import com.misbah.todo.ui.utils.exhaustive
 import com.misbah.todo.ui.utils.onQueryTextChanged
 import com.nytimes.utils.AppEnums
@@ -55,6 +56,8 @@ class TasksFragment :  BaseFragment<TasksViewModel>(), OnItemClickListener {
 
     @Inject
     lateinit var factory: ViewModelProvider.Factory
+    @Inject
+    lateinit var utils: Utils
     private val binding get() = _binding!!
     override fun getViewModel(): TasksViewModel {
         viewModel = ViewModelProvider(viewModelStore, factory)[TasksViewModel::class.java]
@@ -125,28 +128,21 @@ class TasksFragment :  BaseFragment<TasksViewModel>(), OnItemClickListener {
         }
 
         viewModel.remoteTasks.observe(viewLifecycleOwner) {
-            AppLog.debugD("REMOTE LIST: ${it.data?.todos?.size}")
             if (it.data != null) {
                 for (todo in it.data.todos) {
                     viewModel.localTasks.value.let {
+                        todo.createdLong = utils.dateValue(todo.created)
+                        todo.due = utils.dateValue(todo.created)
                         viewModel.saveRemoteTask(todo)
                     }
                 }
+                viewModel.onFirstLaunch()
             }
         }
-
         viewModel.localTasks.observe(viewLifecycleOwner) {
             AppLog.debugD("LOCAL LIST FIRST: ${it}")
-            //viewModel.deleteTask(20, it)
-            //AppLog.debugD("LOCAL LIST LAST: ${it}")
-        }
 
-        viewModel.localTaskByCat(AppEnums.TasksCategory.General.value).observe(viewLifecycleOwner) {
-            AppLog.debugD("LOCAL LIST General: ${it}")
-            //viewModel.deleteTask(20, it)
-            //AppLog.debugD("LOCAL LIST LAST: ${it}")
         }
-
 
         viewModel.remainingTasks?.observe(viewLifecycleOwner){
             AppLog.debugD("SIZE: ${it.size}")

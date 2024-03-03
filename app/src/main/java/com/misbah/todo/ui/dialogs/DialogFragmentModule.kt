@@ -1,5 +1,6 @@
 package com.misbah.todo.ui.dialogs
 
+import android.content.Context
 import androidx.lifecycle.ViewModelProvider
 import com.misbah.todo.core.data.storage.PreferencesManager
 import com.misbah.todo.core.data.storage.TaskDao
@@ -24,8 +25,8 @@ class DialogFragmentModule {
     }
 
     @Provides
-    fun provideDialogRepository(taskDao : TaskDao) : DialogRepository {
-        return DialogRepository(taskDao)
+    fun provideDialogRepository(taskDao : TaskDao, context: Context) : DialogRepository {
+        return DialogRepository(taskDao, context)
     }
 
     @Provides

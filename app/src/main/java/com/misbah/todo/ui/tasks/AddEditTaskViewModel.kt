@@ -7,20 +7,21 @@ import androidx.lifecycle.viewModelScope
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
-import com.misbah.todo.core.data.model.Task
 import com.misbah.todo.core.data.model.ToDo
 import com.misbah.todo.core.data.storage.TaskDao
-import com.misbah.todo.core.data.storage.copy
 import com.misbah.todo.notifications.NotificationWorker
 import com.misbah.todo.ui.main.ADD_TASK_RESULT_OK
 import com.misbah.todo.ui.main.EDIT_TASK_RESULT_OK
 import com.misbah.todo.ui.utils.Constants
+import com.nytimes.utils.AppEnums
 import com.nytimes.utils.AppLog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import java.util.Date
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -38,12 +39,15 @@ class AddEditTaskViewModel @Inject constructor(
 ) : ViewModel() {
 
     var task = MutableLiveData<ToDo>()
-
+    var nextTaskId = MutableLiveData<Int>(0)
+    val taskRepository = TaskRepository(context)
     var selectedDateTime = task.value?.due ?: System.currentTimeMillis()
     var taskTitle = task.value?.title ?: ""
     var taskDescription = task.value?.name ?: ""
     var taskImportance = task.value?.priorityValue ?: 0
+    var taskImportanceString = task.value?.displayPriority ?: AppEnums.TasksPriority.Normal.name
     var tasksCategory = task.value?.categoryValue ?: 0
+    var tasksCategoryString = task.value?.category ?: AppEnums.TasksCategory.General.name
 
     var dueDate = selectedDateTime
 
@@ -61,9 +65,8 @@ class AddEditTaskViewModel @Inject constructor(
             return
         }
         if (task.value != null) {
-            //val updatedTask =  task.value!!.copy(name = taskDescription, title = taskTitle , important = taskImportance, category = tasksCategory, due = dueDate)
-            //val updatedTask =  task.value!!.copy(task = taskDescription, title = taskTitle , important = taskImportance, category = tasksCategory, due = dueDate)
-            //updateTask(updatedTask)
+            val updatedTask =  task.value!!.copy(name = taskDescription, title = taskTitle , important = taskImportanceString, priority = taskImportance , category = tasksCategoryString,categoryId = tasksCategory, due = dueDate)
+            updateTask(updatedTask)
             try {
                 WorkManager.getInstance(context).cancelAllWorkByTag(task.value?.due.toString())
                 //Update Schedule Tasks
@@ -72,9 +75,9 @@ class AddEditTaskViewModel @Inject constructor(
                 e.localizedMessage?.let { AppLog.debugD(it) }
             }
         } else {
-            val newTask = Task(name = taskDescription, title = taskTitle, important = taskImportance, category = tasksCategory, due = dueDate)
+            val id = nextTaskId.value
+            val newTask = ToDo(name = taskDescription, title = taskTitle, important = taskImportanceString, priority = taskImportance , category = tasksCategoryString, categoryId = tasksCategory, due = dueDate, id = id!!+1, userId = 1, createdLong = System.currentTimeMillis(), completed =  false, created = Date().toString())
             createTask(newTask)
-
             //Schedule Tasks
             createTaskReminder(taskTitle, taskDescription, dueDate.toString(), dueDate)
         }
@@ -105,13 +108,18 @@ class AddEditTaskViewModel @Inject constructor(
         dateTimeWithResult(result)
     }
 
-    private fun createTask(task: Task) =  CoroutineScope(Dispatchers.IO).launch {
-        taskDao.insert(task)
+    private fun createTask(task: ToDo) =  CoroutineScope(Dispatchers.IO).launch {
+        taskRepository.saveTask(task)
         addEditTaskEventChannel.send(AddEditTaskEvent.NavigateBackWithResult(ADD_TASK_RESULT_OK))
     }
 
-    private fun updateTask(task: Task) =  CoroutineScope(Dispatchers.IO).launch {
-        taskDao.update(task)
+    fun getSizeOfTaskList()= CoroutineScope(Dispatchers.IO).launch {
+        nextTaskId.value = taskRepository.getTaskListSize()
+    }
+
+
+    private fun updateTask(task: ToDo) =  CoroutineScope(Dispatchers.IO).launch {
+        taskRepository.updateTask(task)
         addEditTaskEventChannel.send(AddEditTaskEvent.NavigateBackWithResult(EDIT_TASK_RESULT_OK))
     }
 

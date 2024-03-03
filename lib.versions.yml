@@ -1,0 +1,9 @@
+  [versions]
+  protobuf-javalite = "3.23.3"
+  protobuf-plugin = "0.9.3"
+  
+  [libraries]
+  protobuf-javalite = {module = "com.google.protobuf:protobuf-javalite", version.ref = "protobuf-javalite"}
+  
+  [plugins]
+  protobuf = { id = "com.google.protobuf", version.ref = "protobuf-plugin"}

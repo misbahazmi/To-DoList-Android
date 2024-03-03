@@ -14,11 +14,13 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.misbah.todo.R
-import com.misbah.todo.core.data.model.Task
+import com.misbah.todo.core.data.model.ToDo
 import com.misbah.todo.databinding.ItemTaskBinding
 import com.misbah.todo.ui.listeners.OnItemClickListener
+import com.misbah.todo.ui.utils.Utils
 import com.nytimes.utils.AppEnums
 import java.security.AccessController.getContext
+import javax.inject.Inject
 
 /**
  * @author: Mohammad Misbah
@@ -29,8 +31,9 @@ import java.security.AccessController.getContext
  * Expertise: Android||Java/Kotlin||Flutter
  */
 class TasksAdapter(private val listener: OnItemClickListener) :
-    ListAdapter<Task, TasksAdapter.TasksViewHolder>(DiffCallback()) {
-
+    ListAdapter<ToDo, TasksAdapter.TasksViewHolder>(DiffCallback()) {
+    @Inject
+    lateinit var utils: Utils
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TasksViewHolder {
         val binding = ItemTaskBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return TasksViewHolder(binding)
@@ -70,18 +73,18 @@ class TasksAdapter(private val listener: OnItemClickListener) :
             }
         }
 
-        fun bind(task: Task) {
+        fun bind(task: ToDo) {
             binding.apply {
                 checkBoxCompleted.isChecked = task.completed
                 textViewName.text = task.name
                 textViewTitle.text = task.title
                 textViewDateDue.text = task.dueDateFormatted
                 textPriority.text = task.displayPriority
-                textPriority.isVisible = task.important != 0
+                textPriority.isVisible = task.priorityValue != 0
                 textViewName.paint.isStrikeThruText = task.completed
                 textViewTitle.paint.isStrikeThruText = task.completed
                 textViewDateDue.paint.isStrikeThruText = task.completed
-                when(task.important){
+                when(task.priorityValue){
                     AppEnums.TasksPriority.High.value->{
                         textPriority.background = ContextCompat.getDrawable(root.context, R.drawable.bg_hight_priority)
                         textPriority.setTextColor( ContextCompat.getColor(root.context, R.color.text_color_high))
@@ -101,16 +104,16 @@ class TasksAdapter(private val listener: OnItemClickListener) :
         }
     }
 
-    class DiffCallback : DiffUtil.ItemCallback<Task>() {
-        override fun areItemsTheSame(oldItem: Task, newItem: Task) =
+    class DiffCallback : DiffUtil.ItemCallback<ToDo>() {
+        override fun areItemsTheSame(oldItem: ToDo, newItem: ToDo) =
             oldItem.id == newItem.id
 
-        override fun areContentsTheSame(oldItem: Task, newItem: Task) =
+        override fun areContentsTheSame(oldItem: ToDo, newItem: ToDo) =
             oldItem == newItem
     }
 
     @SuppressLint("RestrictedApi")
-    fun openOptionMenu(v: View, task: Task, listener : OnItemClickListener) {
+    fun openOptionMenu(v: View, task: ToDo, listener : OnItemClickListener) {
         val popup = PopupMenu(v.context, v)
         popup.menuInflater.inflate(R.menu.navigation_menu_task_items, popup.menu)
         popup.setOnMenuItemClickListener { item ->

@@ -6,6 +6,8 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:fitsSystemWindows="true"
+        android:layoutDirection="locale"
+        android:textDirection="locale"
         android:background="@drawable/bg_main"
         android:layout_height="match_parent">
         <ImageView

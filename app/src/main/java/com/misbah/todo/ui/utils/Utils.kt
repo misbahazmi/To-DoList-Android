@@ -10,6 +10,7 @@ import android.widget.Toast
 import com.google.android.material.snackbar.Snackbar
 import com.misbah.todo.R
 import com.nytimes.utils.AppLog
+import java.text.DateFormat
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -68,6 +69,10 @@ open class Utils @Inject constructor(val context: Context) {
         } catch (e: Exception) {
             e.printStackTrace()
         }
+    }
+
+    fun dateFormat(date : Long) : String{
+       return  DateFormat.getDateTimeInstance().format(date)
     }
 
     /**

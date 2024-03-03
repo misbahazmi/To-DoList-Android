@@ -19,6 +19,14 @@ object AppEnums {
     }
 
     enum class TasksCategory(val value: Int) {
-        All(0), Work(1), Personal(2), Wishlist(3), Shopping(4)
+        General(0),
+        Work(1),
+        Personal(2),
+        Cooking(3),
+        Shopping(4),
+        Fun(5),
+        Tour(6),
+        Games(7),
+        Family(8)
     }
 }

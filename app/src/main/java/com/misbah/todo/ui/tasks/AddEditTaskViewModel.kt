@@ -2,14 +2,15 @@ package com.misbah.todo.ui.tasks
 
 import android.content.Context
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.misbah.todo.core.data.model.Task
+import com.misbah.todo.core.data.model.ToDo
 import com.misbah.todo.core.data.storage.TaskDao
+import com.misbah.todo.core.data.storage.copy
 import com.misbah.todo.notifications.NotificationWorker
 import com.misbah.todo.ui.main.ADD_TASK_RESULT_OK
 import com.misbah.todo.ui.main.EDIT_TASK_RESULT_OK
@@ -20,7 +21,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import java.util.UUID
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -37,13 +37,13 @@ class AddEditTaskViewModel @Inject constructor(
     private val context : Context
 ) : ViewModel() {
 
-    var task = MutableLiveData<Task>()
+    var task = MutableLiveData<ToDo>()
 
     var selectedDateTime = task.value?.due ?: System.currentTimeMillis()
     var taskTitle = task.value?.title ?: ""
     var taskDescription = task.value?.name ?: ""
-    var taskImportance = task.value?.important ?: 0
-    var tasksCategory = task.value?.category ?: 0
+    var taskImportance = task.value?.priorityValue ?: 0
+    var tasksCategory = task.value?.categoryValue ?: 0
 
     var dueDate = selectedDateTime
 
@@ -61,8 +61,9 @@ class AddEditTaskViewModel @Inject constructor(
             return
         }
         if (task.value != null) {
-            val updatedTask =  task.value!!.copy(name = taskDescription, title = taskTitle , important = taskImportance, category = tasksCategory, due = dueDate)
-            updateTask(updatedTask)
+            //val updatedTask =  task.value!!.copy(name = taskDescription, title = taskTitle , important = taskImportance, category = tasksCategory, due = dueDate)
+            //val updatedTask =  task.value!!.copy(task = taskDescription, title = taskTitle , important = taskImportance, category = tasksCategory, due = dueDate)
+            //updateTask(updatedTask)
             try {
                 WorkManager.getInstance(context).cancelAllWorkByTag(task.value?.due.toString())
                 //Update Schedule Tasks

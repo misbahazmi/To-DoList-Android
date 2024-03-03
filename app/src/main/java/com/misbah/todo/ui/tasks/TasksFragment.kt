@@ -1,7 +1,6 @@
 package com.misbah.todo.ui.tasks
 
 import android.os.Bundle
-import android.view.ContextMenu
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -9,24 +8,26 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
+import androidx.collection.arraySetOf
 import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.chip.Chip
 import com.google.android.material.snackbar.Snackbar
-import com.misbah.chips.ChipCloud
 import com.misbah.chips.ChipListener
 import com.misbah.todo.R
 import com.misbah.todo.core.base.BaseFragment
 import com.misbah.todo.core.data.model.Category
 import com.misbah.todo.core.data.model.Task
+import com.misbah.todo.core.data.model.ToDo
 import com.misbah.todo.core.data.storage.SortOrder
+import com.misbah.todo.core.data.storage.TaskData
 import com.misbah.todo.databinding.FragmentTasksBinding
 import com.misbah.todo.ui.adapters.TasksAdapter
 import com.misbah.todo.ui.listeners.OnItemClickListener
@@ -51,6 +52,7 @@ class TasksFragment :  BaseFragment<TasksViewModel>(), OnItemClickListener {
     private var _binding: FragmentTasksBinding? = null
     internal lateinit var viewModel: TasksViewModel
     private lateinit var searchView: SearchView
+
     @Inject
     lateinit var factory: ViewModelProvider.Factory
     private val binding get() = _binding!!
@@ -122,6 +124,30 @@ class TasksFragment :  BaseFragment<TasksViewModel>(), OnItemClickListener {
             taskAdapter.submitList(it)
         }
 
+        viewModel.remoteTasks.observe(viewLifecycleOwner) {
+            AppLog.debugD("REMOTE LIST: ${it.data?.todos?.size}")
+            if (it.data != null) {
+                for (todo in it.data.todos) {
+                    viewModel.localTasks.value.let {
+                        viewModel.saveRemoteTask(todo)
+                    }
+                }
+            }
+        }
+
+        viewModel.localTasks.observe(viewLifecycleOwner) {
+            AppLog.debugD("LOCAL LIST FIRST: ${it}")
+            //viewModel.deleteTask(20, it)
+            //AppLog.debugD("LOCAL LIST LAST: ${it}")
+        }
+
+        viewModel.localTaskByCat(AppEnums.TasksCategory.General.value).observe(viewLifecycleOwner) {
+            AppLog.debugD("LOCAL LIST General: ${it}")
+            //viewModel.deleteTask(20, it)
+            //AppLog.debugD("LOCAL LIST LAST: ${it}")
+        }
+
+
         viewModel.remainingTasks?.observe(viewLifecycleOwner){
             AppLog.debugD("SIZE: ${it.size}")
         }
@@ -173,13 +199,10 @@ class TasksFragment :  BaseFragment<TasksViewModel>(), OnItemClickListener {
             else
                 binding.chipTasksCategory.setSelectedChip(0)
         }
-
         setHasOptionsMenu(true)
         (requireActivity() as MainActivity).showFAB()
         viewModel.getTasksRemainingTask()
     }
-
-
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.main, menu)
 
@@ -233,18 +256,17 @@ class TasksFragment :  BaseFragment<TasksViewModel>(), OnItemClickListener {
         super.onDestroyView()
         _binding = null
         searchView.setOnQueryTextListener(null)
-
     }
 
-    override fun onItemClick(task: Task) {
+    override fun onItemClick(task: ToDo) {
         viewModel.onTaskSelected(task)
     }
 
-    override fun onItemDeleteClick(task: Task) {
+    override fun onItemDeleteClick(task: ToDo) {
         viewModel.onTaskSwiped(task)
     }
 
-    override fun onItemEditClick(task: Task) {
+    override fun onItemEditClick(task: ToDo) {
         val action =
             TasksFragmentDirections.actionTasksFragmentToAddEditTaskFragment(
                 "Edit Tasks",
@@ -253,7 +275,7 @@ class TasksFragment :  BaseFragment<TasksViewModel>(), OnItemClickListener {
         findNavController().navigate(action)
     }
 
-    override fun onCheckBoxClick(task: Task, isChecked: Boolean) {
+    override fun onCheckBoxClick(task: ToDo, isChecked: Boolean) {
         viewModel.onTaskCheckedChanged(task, isChecked)
     }
 }

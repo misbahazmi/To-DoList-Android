@@ -6,6 +6,8 @@
     xmlns:chipcloud="http://schemas.android.com/apk/res-auto"
     android:background="@drawable/bg_main"
     android:layout_height="match_parent"
+    android:layoutDirection="locale"
+    android:textDirection="locale"
     tools:context=".ui.tasks.TasksFragment">
 
     <LinearLayout

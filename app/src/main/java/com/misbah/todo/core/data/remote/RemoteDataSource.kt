@@ -13,5 +13,9 @@ import javax.inject.Inject
  * Expertise: Android||Java/Kotlin||Flutter
  */
 class RemoteDataSource @Inject constructor(private val apiService: APIService) : BaseDataSource(){
-    //suspend method to access data from API services
+    /* suspend method to access tasks data from API services
+     */
+    suspend fun getDefaultTasks() = getResults {
+       apiService.getDefaultTasks()
+    }
 }

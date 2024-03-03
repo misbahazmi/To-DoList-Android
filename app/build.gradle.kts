@@ -1,4 +1,4 @@
-
+import org.gradle.internal.impldep.org.apache.http.client.methods.RequestBuilder.options
 
 plugins {
     id("com.android.application")
@@ -7,6 +7,7 @@ plugins {
     id("kotlin-kapt")
     id("kotlin-parcelize")
     id("androidx.navigation.safeargs.kotlin")
+    id("com.google.protobuf") version "0.9.4"
 }
 
 android {
@@ -96,16 +97,37 @@ dependencies {
     implementation("androidx.room:room-ktx:2.6.1")
 
     //Datastore
-    implementation("androidx.datastore:datastore-preferences:1.1.0-beta01")
-    // Proto DataStore
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+
+    // Proto datastore
     implementation("androidx.datastore:datastore:1.0.0")
+    implementation("com.google.protobuf:protobuf-javalite:3.21.11")
+    implementation("com.google.protobuf:protobuf-kotlin-lite:3.21.11")
 
     //Work manager
     implementation("androidx.work:work-runtime-ktx:2.9.0")
 
-    // protob
-    implementation("com.google.protobuf:protobuf-javalite:3.17.3")
-
     //TagView
     implementation(project(":chips-view-lib"))
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:3.24.1"
+    }
+    // Generates the java Protobuf-lite code for the Protobufs in this project. See
+    // https://github.com/google/protobuf-gradle-plugin#customizing-protobuf-compilation
+    // for more information.
+    generateProtoTasks {
+        all().forEach { task ->
+            task.builtins {
+                create("java") {
+                    option("lite")
+                }
+                create("kotlin") {
+                    option("lite")
+                }
+            }
+        }
+    }
 }

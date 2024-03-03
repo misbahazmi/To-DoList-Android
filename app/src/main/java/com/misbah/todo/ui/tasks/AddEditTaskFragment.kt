@@ -25,6 +25,7 @@ import com.misbah.todo.ui.adapters.CategoryArrayAdapter
 import com.misbah.todo.ui.dialogs.TimePickerFragment
 import com.misbah.todo.ui.listeners.OnDateTimeListener
 import com.misbah.todo.ui.main.MainActivity
+import com.misbah.todo.ui.utils.Utils
 import com.misbah.todo.ui.utils.exhaustive
 import com.nytimes.utils.AppEnums
 import kotlinx.coroutines.launch
@@ -45,6 +46,8 @@ class AddEditTaskFragment : BaseFragment<AddEditTaskViewModel>(), OnDateTimeList
     internal lateinit var viewModel: AddEditTaskViewModel
     @Inject
     lateinit var factory: ViewModelProvider.Factory
+    @Inject
+    lateinit var utils: Utils
     private val binding get() = _binding!!
     override fun getViewModel(): AddEditTaskViewModel {
         viewModel = ViewModelProvider(viewModelStore, factory)[AddEditTaskViewModel::class.java]
@@ -78,7 +81,7 @@ class AddEditTaskFragment : BaseFragment<AddEditTaskViewModel>(), OnDateTimeList
 
             editTextTaskTitle.setText(viewModel.task.value?.title ?: "")
             editTextTaskDescription.setText(viewModel.task.value?.name ?: "")
-            textViewDateDue.text = "Due Date: ${viewModel.task.value?.dueDateFormatted ?: DateFormat.getDateTimeInstance().format(viewModel.dueDate)}"
+            textViewDateDue.text = "Due Date: ${utils.dateFormat(viewModel.task.value?.due!!)}"
             viewModel.taskTitle = viewModel.task.value?.title ?: ""
             viewModel.taskDescription = viewModel.task.value?.name ?: ""
             viewModel.dueDate = viewModel.task.value?.due ?: System.currentTimeMillis()
@@ -101,8 +104,8 @@ class AddEditTaskFragment : BaseFragment<AddEditTaskViewModel>(), OnDateTimeList
             for ((index,data)  in AppEnums.TasksPriority.values().distinct().withIndex()){
                chipTasksPriority.addChip(data.name)
             }
-            if(viewModel.task.value?.important != null && viewModel.task.value?.important != 0)
-                viewModel.task.value?.important?.let { chipTasksPriority.setSelectedChip(it) }
+            if(viewModel.task.value?.priorityValue != null && viewModel.task.value?.priorityValue != 0)
+                viewModel.task.value?.priorityValue?.let { chipTasksPriority.setSelectedChip(it) }
             else
                 chipTasksPriority.setSelectedChip(0)
             val catList = arrayListOf<Category>()
@@ -118,8 +121,8 @@ class AddEditTaskFragment : BaseFragment<AddEditTaskViewModel>(), OnDateTimeList
                 }
                 override fun onNothingSelected(parent: AdapterView<*>) {}
             }
-            if(viewModel.task.value?.category != null  && viewModel.task.value?.category != 0)
-                viewModel.task.value?.category?.let { spinnerCategory.setSelection(it) }
+            if(viewModel.task.value?.categoryValue != null  && viewModel.task.value?.categoryValue != 0)
+                viewModel.task.value?.categoryValue?.let { spinnerCategory.setSelection(it) }
             else
                 spinnerCategory.setSelection(0)
         }

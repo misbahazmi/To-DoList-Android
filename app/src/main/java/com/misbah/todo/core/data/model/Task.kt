@@ -4,6 +4,7 @@ package com.misbah.todo.core.data.model
 import android.os.Parcelable
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.google.gson.annotations.SerializedName
 import com.nytimes.utils.AppEnums
 import kotlinx.parcelize.Parcelize
 import java.text.DateFormat
@@ -20,7 +21,7 @@ import java.text.DateFormat
 data class Task(
     val title: String,
     val name: String,
-    val category: Int = AppEnums.TasksCategory.All.value,
+    val category: Int = AppEnums.TasksCategory.General.value,
     val important: Int = AppEnums.TasksPriority.Normal.value,
     val completed: Boolean = false,
     val due: Long = System.currentTimeMillis(),
@@ -43,6 +44,5 @@ data class Task(
                 AppEnums.TasksPriority.High.name
             else->
                 AppEnums.TasksPriority.Normal.name
-
         }
 }

@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+option java_package = "com.misbah.todo.core.data.storage";
+option java_multiple_files = true;
+
+message TasksPreference{
+  string task_title = 1;
+  string task_cat = 2;
+  string task_todo = 3;
+  int32 task_id = 4;
+  bool task_status = 5;
+  int32 task_user_id = 6;
+  string task_date = 7;
+  int64 task_du_date = 8;
+  string task_priority = 9;
+}
+
+message TaskList {
+  repeated TaskData tasks = 1;
+}
+
+message TaskData {
+  string task_title = 1;
+  int32 task_cat = 2;
+  string task_todo = 3;
+  int32 task_id = 4;
+  bool task_status = 5;
+  int32 task_user_id = 6;
+  int64 task_date = 7;
+  int64 task_du_date = 8;
+  int32 task_priority = 9;
+  string task_priority_display = 10;
+  string task_cat_display = 11;
+}
+
+message Category {
+  int32 id = 1;
+  string name = 2;
+}

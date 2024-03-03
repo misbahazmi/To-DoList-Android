@@ -1,23 +1,19 @@
 package com.misbah.todo.ui.tasks
 
-import android.annotation.SuppressLint
 import android.content.Context
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import androidx.room.util.query
-import androidx.work.Data
-import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import com.misbah.todo.core.data.model.Task
+import com.misbah.todo.core.data.model.ToDo
 import com.misbah.todo.core.data.storage.PreferencesManager
 import com.misbah.todo.core.data.storage.SortOrder
 import com.misbah.todo.core.data.storage.TaskDao
-import com.misbah.todo.notifications.NotificationWorker
+import com.misbah.todo.core.data.storage.TaskData
 import com.misbah.todo.ui.main.ADD_TASK_RESULT_OK
 import com.misbah.todo.ui.main.EDIT_TASK_RESULT_OK
 import com.misbah.todo.ui.utils.Constants
@@ -25,12 +21,18 @@ import com.nytimes.utils.AppLog
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.util.concurrent.TimeUnit
+import java.text.SimpleDateFormat
+import java.util.Locale
 import javax.inject.Inject
 
 /**
@@ -43,13 +45,15 @@ import javax.inject.Inject
  */
 class TasksViewModel
 @Inject constructor(
+    private val repository : TasksRepository,
     private val taskDao: TaskDao,
     private val preferencesManager: PreferencesManager,
     state: SavedStateHandle,
     private val context: Context
 )  : ViewModel() {
-    val searchQuery = state.getLiveData("searchQuery", "")
 
+    val searchQuery = state.getLiveData("searchQuery", "")
+    val taskRepository = TaskRepository(context)
     val preferencesFlow = preferencesManager.preferencesFlow
 
     private val tasksEventChannel = Channel<TasksEvent>()
@@ -62,9 +66,36 @@ class TasksViewModel
     ) { query, filterPreferences ->
         Pair(query, filterPreferences)
     }.flatMapLatest { (query, filterPreferences) ->
-        taskDao.getTasks(query, filterPreferences.sortOrder, filterPreferences.hideCompleted, filterPreferences.category)
+        //taskDao.getTasks(query, filterPreferences.sortOrder, filterPreferences.hideCompleted, filterPreferences.category)
+        taskRepository.getTasksByCategory(filterPreferences.category)
     }
     val tasks = tasksFlow.asLiveData()
+
+    private val remoteTaskFlow = combine(
+        searchQuery.asFlow(),
+        preferencesFlow
+    ){query, filterPReferences -> Pair(query, filterPReferences)}.flatMapLatest {
+        repository.getDefaultTasks().asFlow()
+    }
+
+    val localTask = combine(
+        searchQuery.asFlow(),
+        preferencesFlow
+    ){query, filterPReferences -> Pair(query, filterPReferences)}.flatMapLatest {
+        taskRepository.getAllTasks().map {
+            it
+        }
+    }
+
+
+    val remoteTasks  = remoteTaskFlow.asLiveData()
+
+    val localTasks  = taskRepository.getAllTasks().asLiveData()
+
+
+    fun localTaskByCat(id: Int) : LiveData<List<ToDo>>{
+        return taskRepository.getTasksByCategory(id).asLiveData()
+    }
 
     var remainingTasks: LiveData<List<Task>>? = null
 
@@ -80,7 +111,11 @@ class TasksViewModel
         preferencesManager.updateTaskCategory(taskCategory)
     }
 
-    fun onTaskSelected(task: Task) = CoroutineScope(Dispatchers.IO).launch {
+    fun onFirstLaunch()  = CoroutineScope(Dispatchers.IO).launch {
+        preferencesManager.updateFirstLaunch()
+    }
+
+    fun onTaskSelected(task: ToDo) = CoroutineScope(Dispatchers.IO).launch {
         tasksEventChannel.send(TasksEvent.NavigateToEditTaskScreen(task))
     }
 
@@ -90,13 +125,13 @@ class TasksViewModel
         remainingTasks = taskDao.getTasksRemainingTask(true,currentTime,futureTime).asLiveData()
     }
 
-    fun onTaskCheckedChanged(task: Task, isChecked: Boolean) = CoroutineScope(Dispatchers.IO).launch {
-        taskDao.update(task.copy(completed = isChecked))
+    fun onTaskCheckedChanged(task: ToDo, isChecked: Boolean) = CoroutineScope(Dispatchers.IO).launch {
+        //taskDao.update(task.copy(taskStatus = isChecked))
     }
 
-    fun onTaskSwiped(task: Task) {
+    fun onTaskSwiped(task: ToDo) {
         CoroutineScope(Dispatchers.IO).launch {
-            taskDao.delete(task)
+            //taskDao.delete(task)
             tasksEventChannel.send(TasksEvent.ShowUndoDeleteTaskMessage(task))
             try {
                 WorkManager.getInstance(context).cancelAllWorkByTag(task.due.toString())
@@ -105,13 +140,43 @@ class TasksViewModel
             }
         }
     }
-    fun onUndoDeleteClick(task: Task) = CoroutineScope(Dispatchers.IO).launch {
-        taskDao.insert(task)
+
+    fun deleteTask(task: Int, list : List<TaskData>) {
+        CoroutineScope(Dispatchers.IO).launch {
+           taskRepository.deleteTask(task, list)
+        }
+    }
+
+    fun onUndoDeleteClick(task: ToDo) = CoroutineScope(Dispatchers.IO).launch {
+        //taskDao.insert(task)
+    }
+
+    fun saveRemoteTask(todo : ToDo) = CoroutineScope(Dispatchers.IO).launch {
+        val task = TaskData.newBuilder()
+            .setTaskId(todo.id)
+            .setTaskTitle(todo.title)
+            .setTaskTodo(todo.name)
+            .setTaskUserId(1)
+            .setTaskStatus(todo.completed)
+            .setTaskDate(todo.getDateValue())
+            .setTaskDuDate(todo.getDateValue())
+            .setTaskCat(todo.categoryValue)
+            .setTaskCatDisplay(todo.category)
+            .setTaskPriority(todo.priorityValue)
+            .setTaskPriorityDisplay(todo.important)
+            .build()
+        taskRepository.saveTask(task)
+    }
+
+    fun getRemoteTask() = CoroutineScope(Dispatchers.IO).launch {
+        taskRepository.getAllTasks()
     }
 
     fun onAddNewTaskClick() = CoroutineScope(Dispatchers.IO).launch {
         tasksEventChannel.send(TasksEvent.NavigateToAddTaskScreen)
     }
+
+
 
     fun onAddEditResult(result: Int) {
         when (result) {
@@ -130,8 +195,8 @@ class TasksViewModel
 
     sealed class TasksEvent {
         data object NavigateToAddTaskScreen : TasksEvent()
-        data class NavigateToEditTaskScreen(val task: Task) : TasksEvent()
-        data class ShowUndoDeleteTaskMessage(val task: Task) : TasksEvent()
+        data class NavigateToEditTaskScreen(val task: ToDo) : TasksEvent()
+        data class ShowUndoDeleteTaskMessage(val task: ToDo) : TasksEvent()
         data class ShowTaskSavedConfirmationMessage(val msg: String) : TasksEvent()
         data object NavigateToDeleteAllCompletedScreen : TasksEvent()
         data object QuitAppPopUp : TasksEvent()

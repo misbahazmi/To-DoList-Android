@@ -1,18 +1,14 @@
 package com.misbah.todo.notifications
-import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.asLiveData
 import com.misbah.todo.core.data.model.Task
 import com.misbah.todo.core.data.storage.TaskDao
-import com.misbah.todo.ui.dialogs.DialogRepository
 import com.misbah.todo.ui.utils.Constants
 import com.nytimes.utils.AppLog
-import dagger.Provides
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import javax.inject.Singleton
 
 /**
  * @author: Mohammad Misbah

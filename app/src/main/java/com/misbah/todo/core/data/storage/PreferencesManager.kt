@@ -19,7 +19,7 @@ private const val TAG = "PreferencesManager"
 
 enum class SortOrder { BY_NAME, BY_DATE, BY_PRIORITY }
 
-data class FilterPreferences(val sortOrder: SortOrder, val hideCompleted: Boolean, val category : Int)
+data class FilterPreferences(val sortOrder: SortOrder, val hideCompleted: Boolean, val category : Int, val isFirstLaunch: Boolean)
 
 class PreferencesManager @Inject constructor(private  val context : Context) {
 
@@ -41,8 +41,9 @@ class PreferencesManager @Inject constructor(private  val context : Context) {
                 preferences[PreferencesKeys.SORT_ORDER] ?: SortOrder.BY_DATE.name
             )
             val hideCompleted = preferences[PreferencesKeys.HIDE_COMPLETED] ?: false
+            val isFirstLaunch = preferences[PreferencesKeys.FIRST_TIME_LAUNCH] ?: true
             val taskCategory = preferences[PreferencesKeys.TASK_CATEGORY] ?: 0
-            FilterPreferences(sortOrder, hideCompleted, taskCategory)
+            FilterPreferences(sortOrder, hideCompleted, taskCategory, isFirstLaunch)
         }
 
     suspend fun updateSortOrder(sortOrder: SortOrder) {
@@ -57,6 +58,12 @@ class PreferencesManager @Inject constructor(private  val context : Context) {
         }
     }
 
+    suspend fun updateFirstLaunch() {
+        context.dataStore.edit { preferences ->
+            preferences[PreferencesKeys.FIRST_TIME_LAUNCH] = false
+        }
+    }
+
     suspend fun updateTaskCategory(category: Int) {
         context.dataStore.edit { preferences ->
             preferences[PreferencesKeys.TASK_CATEGORY] = category
@@ -64,6 +71,7 @@ class PreferencesManager @Inject constructor(private  val context : Context) {
     }
 
     private object PreferencesKeys {
+        val FIRST_TIME_LAUNCH = booleanPreferencesKey("fist_time_launch")
         val SORT_ORDER = stringPreferencesKey("sort_order")
         val HIDE_COMPLETED = booleanPreferencesKey("hide_completed")
         val TASK_CATEGORY = intPreferencesKey("task_category")
